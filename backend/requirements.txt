@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+httpx
+requests
+beautifulsoup4
+html5lib
+groq
+google-genai
+python-dotenv
+aiofiles
+playwright

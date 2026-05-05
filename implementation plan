@@ -1,0 +1,274 @@
+# Pixii.ai Founding Engineer Project: Strategic Selection & Implementation Plan
+
+## The Strategic Decision
+
+### Why Most Options Fail the "Wow" Test
+
+| Project | Problem |
+|---|---|
+| AI Influencer | Needs paid video API (HeyGen, D-ID) |
+| UGC Video | Needs paid video generation |
+| Photo Upgrader | Needs paid upscaling API |
+| Packaging to 3D | Too niche, Blender setup is complex for 4-6 hrs |
+| Viral Video Chopper | YouTube TOS issues, mostly solved by existing tools |
+| Shopify App | Needs Shopify partner account + store |
+
+### ✅ THE WINNER: "CompeteAI" — Amazon Review Intelligence Platform
+
+**Project Type:** Review Analytics + Market Size Estimator (combined into one power tool)
+
+**Why this wins:**
+
+1. **Direct business value for Pixii.ai's customers** — Amazon sellers are their ICP (Ideal Customer Profile). This tool tells a seller exactly WHY customers buy, who their real competitors are, and WHERE to focus their content/product strategy.
+
+2. **Two projects in one** → Over-delivers. You're doing Review Analytics AND Market Size Estimator.
+
+3. **All free APIs** → Fully achievable.
+
+4. **Live deployed app** → Founders can use it RIGHT NOW on their own listings.
+
+5. **Shows entrepreneurial thinking** → You're not just coding, you're solving the problem sellers pay Pixii.ai to solve.
+
+6. **Data moat angle** → You can pitch: "This is the data intelligence layer Pixii.ai should own before generating content."
+
+### The Pitch Angle
+
+> "Before Pixii.ai generates a viral photo or hook, the seller needs to know: What do customers actually care about? What are competitors failing at? What's the market size? CompeteAI answers all three — in 60 seconds."
+
+---
+
+## Product: CompeteAI 🧠
+
+**Tagline:** *"Know your market before you make your content."*
+
+### What It Does (User Flow)
+
+```
+User pastes: Amazon Best Sellers URL OR any Amazon product search
+     ↓
+CompeteAI scrapes top 10 competitor listings + 100+ reviews each
+     ↓
+AI analyzes: Purchase criteria, pain points, what customers love/hate
+     ↓
+Output Dashboard:
+  ✅ Market Size (estimated monthly revenue of entire market)
+  ✅ Top 10 competitors with individual revenue estimates
+  ✅ Key Purchase Criteria ranked by frequency
+  ✅ Sentiment Heatmap (what reviewers love vs. hate)
+  ✅ Content Strategy Recommendations ("focus on durability in your copy")
+  ✅ Opportunity gaps (what no competitor is doing well)
+```
+
+---
+
+## Tech Stack (100% Free)
+
+| Layer | Tool | Why Free |
+|---|---|---|
+| **Scraping** | `playwright` + `BeautifulSoup4` | Open source Python |
+| **Anti-bot bypass** | `playwright` with stealth mode + delays | Free |
+| **AI Analysis (Fast)** | **Groq API** (free tier — llama-3.1-70b) | 14,400 req/day free |
+| **AI Deep Insights** | **Google Gemini API** (free tier — gemini-1.5-flash) | 1500 req/day free |
+| **Backend** | Python + FastAPI | Open source |
+| **Frontend** | Next.js or pure HTML/CSS/JS | Open source |
+| **Charts** | Chart.js | Open source |
+| **Deployment** | **Vercel** (frontend) + **Railway.app** (backend, free tier) | Both free |
+| **Database** | SQLite (local) or Supabase (free tier) | Free |
+
+### Why Groq + Gemini (2 APIs = Rule satisfied)
+- **Groq**: Ultra-fast inference for bulk review analysis (process 100s of reviews quickly)
+- **Gemini**: Deep strategic analysis and report generation (the "intelligence" layer)
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CompeteAI                            │
+│                                                         │
+│  [Frontend: Next.js / HTML]                            │
+│   └── Beautiful dashboard with charts & insights       │
+│                                                         │
+│  [Backend: Python FastAPI]                             │
+│   ├── Scraper Module (Playwright + BS4)                │
+│   │   ├── Scrape Amazon search results                 │
+│   │   ├── Scrape each product listing                  │
+│   │   └── Scrape reviews (paginated)                   │
+│   │                                                     │
+│   ├── Analysis Module                                   │
+│   │   ├── Groq API → Review sentiment & criteria       │
+│   │   └── Gemini API → Strategic recommendations       │
+│   │                                                     │
+│   ├── Revenue Estimator                                │
+│   │   ├── BSR (Best Seller Rank) → Sales formula       │
+│   │   └── Price × estimated sales = revenue            │
+│   │                                                     │
+│   └── Report Generator                                 │
+│       └── JSON → Beautiful HTML report                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Implementation Plan (4-6 Hours)
+
+### Phase 1: Setup & Scraping Engine (1.5 hours)
+
+**Files to create:**
+```
+competeai/
+├── backend/
+│   ├── main.py              # FastAPI app
+│   ├── scraper.py           # Amazon scraper
+│   ├── analyzer.py          # AI analysis engine
+│   ├── revenue_estimator.py # BSR-based revenue formula
+│   └── requirements.txt
+├── frontend/
+│   ├── index.html           # Beautiful single-page app
+│   ├── styles.css           # Premium dark UI
+│   └── app.js               # Dashboard logic + Chart.js
+└── README.md
+```
+
+**`scraper.py` — Key Logic:**
+```python
+# Amazon scraper using Playwright (headless browser)
+# Scrapes: title, price, BSR, rating, review count, ASIN
+# Then scrapes reviews for each product (up to 100 reviews/product)
+
+class AmazonScraper:
+    async def search_products(self, keyword: str) -> list[Product]
+    async def get_product_reviews(self, asin: str) -> list[Review]
+    async def get_bestsellers(self, url: str) -> list[Product]
+```
+
+**Revenue Estimation Formula (BSR → Sales):**
+```
+# Industry-standard approximation:
+# Sales/day ≈ (10,000 / BSR)^0.5 × category_multiplier
+# Monthly Revenue = Sales/day × 30 × Price
+# This is what Jungle Scout uses (publicly documented formula)
+```
+
+### Phase 2: AI Analysis Engine (1.5 hours)
+
+**`analyzer.py` — Two-stage AI pipeline:**
+
+**Stage 1 — Groq (fast, bulk):**
+```python
+# For each batch of 20 reviews, ask Groq:
+# "From these reviews, extract:
+#  1. Top purchase criteria mentioned (with frequency count)
+#  2. What customers love (positive themes)
+#  3. What customers hate (negative themes)
+#  4. Exact quotes that reveal unmet needs"
+# Returns structured JSON
+```
+
+**Stage 2 — Gemini (strategic synthesis):**
+```python
+# After processing all reviews across all competitors:
+# "Given this competitive landscape data, provide:
+#  1. The #1 content angle Pixii.ai users should use
+#  2. Which competitor has the weakest content strategy
+#  3. What product improvement would capture 20% more market share
+#  4. The emotional trigger that drives 80% of purchases in this market"
+```
+
+### Phase 3: Revenue Dashboard (1 hour)
+
+**Metrics to show:**
+- Total market monthly revenue (sum of all top 10)
+- Individual competitor revenue bars (Chart.js bar chart)
+- Purchase criteria bubble chart (size = frequency of mention)
+- Sentiment heatmap per competitor
+- "Opportunity Score" (custom metric = market size × competitor weakness)
+
+### Phase 4: Beautiful Frontend (1 hour)
+
+**Design: Dark premium UI**
+- Background: `#0A0A0F` (deep black)
+- Accent: `#6366F1` (electric indigo — feels AI/tech)
+- Cards: glassmorphism effect
+- Animated progress during scraping ("Analyzing 847 reviews...")
+- Export to PDF button
+
+### Phase 5: Deploy & Polish (30 min)
+
+- Backend → Railway.app (free Python hosting)
+- Frontend → Vercel (free)
+- Record 3-min Loom video
+
+---
+
+## The "Founder Goes Crazy" Differentiators
+
+### 1. The Pixii.ai Integration Pitch
+In your video, say:
+> "Imagine Pixii.ai uses this as step 1: Before generating any content, we run CompeteAI. Now your AI knows the exact words, emotions, and criteria that make customers BUY — and injects that into every photo caption, hook, and listing it generates. This turns Pixii from a content tool into a conversion tool."
+
+### 2. The "Content Strategy" Output
+Don't just show data. Show **actionable content recommendations** like:
+- "72% of reviewers mention 'ease of setup' — make this your hero shot caption"
+- "Competitor X has 34% 1-star reviews about 'poor packaging' — your opportunity"
+
+### 3. The Live Demo Hook
+Deploy on a real URL. In the video, paste a REAL Amazon best sellers URL and let it run LIVE in front of the camera. Raw, unscripted, real results. That confidence = founding engineer energy.
+
+---
+
+## Free API Registration Checklist
+
+- [ ] **Groq API**: https://console.groq.com → Free, instant signup → get `GROQ_API_KEY`
+- [ ] **Google Gemini API**: https://aistudio.google.com → Free tier → get `GEMINI_API_KEY`
+- [ ] **Railway.app**: https://railway.app → Free tier (500 hrs/month)
+- [ ] **Vercel**: https://vercel.com → Free forever for frontend
+
+---
+
+## Video Script Outline (3 minutes)
+
+**[0:00–0:20] Hook**
+"Amazon sellers spend $500/month on tools just to answer one question: WHY do customers buy? I built something that answers it in 60 seconds — for free."
+
+**[0:20–0:40] About me**
+Name, school, CGPA, proudest accomplishment.
+
+**[0:40–2:00] Live demo**
+Paste URL → watch it work → show dashboard → highlight the AI insights that would directly improve content strategy.
+
+**[2:00–2:30] Design decisions**
+"I thought about who the user is — an Amazon seller who needs to make content decisions fast. So I made the output actionable, not just data."
+
+**[2:30–2:50] APIs used**
+Groq (fast bulk analysis) + Gemini (strategic synthesis) + Playwright (scraping).
+
+**[2:50–3:00] What's next**
+"With more time, I'd: (1) add a Chrome extension for one-click analysis, (2) pipe insights directly into Pixii.ai's content generation prompt, (3) add weekly monitoring alerts."
+
+---
+
+## Risk Mitigation
+
+### Amazon Blocks Scrapers?
+- Use Playwright with random delays (2-5 seconds between requests)
+- Rotate User-Agents
+- If blocked: use **ScraperAPI free tier** (1000 free requests) as fallback
+- Or use **Rainforest API free tier** (100 free requests) for Amazon data
+
+### Groq/Gemini Rate Limits?
+- Implement request queuing
+- Cache results in SQLite
+- Groq free tier: 14,400 requests/day — more than enough
+
+---
+
+## Verification Plan
+
+1. Test with 3 real Amazon best sellers URLs (different categories)
+2. Verify revenue estimates are in the right ballpark (cross-check with known tools)
+3. Verify AI insights are actionable and specific (not generic)
+4. Confirm deployed URLs work from a fresh browser (incognito)
+5. Record video demo on deployed URL
+

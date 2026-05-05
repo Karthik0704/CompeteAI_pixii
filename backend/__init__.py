@@ -1,0 +1,2 @@
+"""CompeteAI backend package."""
+
